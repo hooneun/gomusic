@@ -51,7 +51,9 @@ func (h *Handler) GetPromos(c *gin.Context) {
 	if h.db == nil {
 		return
 	}
+
 	promos, err := h.db.GetPromos()
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
@@ -109,7 +111,7 @@ func (h *Handler) SignOut(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	err = h.db.SignOutUserById(id)
+	err = h.db.SignOutUserByID(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
