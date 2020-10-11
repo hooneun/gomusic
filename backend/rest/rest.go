@@ -17,9 +17,10 @@ func RunAPI(address string) error {
 // RunAPIWithHandler API List!
 func RunAPIWithHandler(address string, h HandlerInterface) error {
 	r := gin.Default()
+	r.Use(MyCustomLogger())
 	r.GET("/products", h.GetProducts)
 	r.GET("/promos", h.GetProducts)
-	// r.POST("/users/signin", h.SiginIn)
+	// r.POST("/use/Sirs/signin", h.SiginIn)
 	// r.POST("/users", h.AddUser)
 	// r.POST("/user/:id/signout", h.SignOut)
 	// r.GET("/user/:id/orders", h.GetOrders)
