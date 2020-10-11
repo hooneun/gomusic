@@ -109,8 +109,9 @@ func (db *DBORM) GetCreditCardCID(id int) (string, error) {
 	return customerWithCCID.CCID, db.First(&customerWithCCID).Error
 }
 
+//SaveCreditCardForCustomer !
 func (db *DBORM) SaveCreditCardForCustomer(id int, ccid string) error {
-	result := db.Table("customers").Where("id=?" id)
+	result := db.Table("customers").Where("id=?", id)
 	return result.Update("cc_customerid", ccid).Error
 }
 
