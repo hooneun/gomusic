@@ -28,7 +28,14 @@ type Handler struct {
 
 // NewHandler create construct
 func NewHandler() (*Handler, error) {
-	return new(Handler), nil
+	db, err := dblayer.NewORM()
+	if err != nil {
+		return nil, err
+	}
+	return &Handler{
+		db: db,
+	}, nil
+	// return new(Handler), nil
 }
 
 // GetProducts return products
@@ -146,6 +153,20 @@ func (h *Handler) GetOrders(c *gin.Context) {
 // Charge Product Payment!!!!!!
 func (h *Handler) Charge(c *gin.Context) {
 	if h.db == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "server database error"})
+		return
+	}
+
+	// 구조체 선언 동시에 초기화
+	request := struct {
+		models.Order
+		Remember   bool `json:"rememberCard"`
+		UseExiting bool `json:"useExisting"`
+	}{}
+
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, request)
 		return
 	}
 }
