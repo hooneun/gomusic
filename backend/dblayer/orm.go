@@ -95,6 +95,25 @@ func (db *DBORM) GetCustomerOrdersByID(id int) (orders []models.Order, err error
 	return orders, db.Table("orders").Select("*").Joins("join customers on customers.id = customer_id").Joins("join products on products.id = product_id").Where("customer_id = ?", id).Scan(&orders).Error
 }
 
+// AddOrder !
+func (db *DBORM) AddOrder(order models.Order) error {
+	return db.Create(&order).Error
+}
+
+// GetCreditCardCID !
+func (db *DBORM) GetCreditCardCID(id int) (string, error) {
+	customerWithCCID := struct {
+		models.Customer
+		CCID string `gorm:"column:cc_customerid"`
+	}{}
+	return customerWithCCID.CCID, db.First(&customerWithCCID).Error
+}
+
+func (db *DBORM) SaveCreditCardForCustomer(id int, ccid string) error {
+	result := db.Table("customers").Where("id=?" id)
+	return result.Update("cc_customerid", ccid).Error
+}
+
 func hashPassword(s *string) error {
 	if s == nil {
 		return errors.New("Reference provided for hashing password is nil")
