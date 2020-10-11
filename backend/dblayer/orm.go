@@ -14,6 +14,9 @@ type DBORM struct {
 	*gorm.DB
 }
 
+// ErrINVALIDPASSWORD ,
+var ErrINVALIDPASSWORD = errors.New("Invalid password")
+
 // NewORM !
 func NewORM() (*DBORM, error) {
 	dns := "root@tcp(127.0.0.1:3306)/todo_list?charset=utf8&parseTime=True&loc=Local"
@@ -57,17 +60,23 @@ func (db *DBORM) AddUser(customer models.Customer) (models.Customer, error) {
 }
 
 // SignInUser signin
-func (db *DBORM) SignInUser(email, password string) (cutomser models.Customer, err error) {
-	// if !checkPassword(password) {
-	// return cutomser, errors.New("Invalid password")
-	// }
+func (db *DBORM) SignInUser(email, password string) (customer models.Customer, err error) {
+
 	result := db.Table("Cutomers").Where(&models.Customer{Email: email})
-	err = result.Update("loggedin", 1).Error
+	err = result.First(&customer).Error
 	if err != nil {
-		return cutomser, err
+		return customer, err
+	}
+	if !checkPassword(customer.Password, password) {
+		return customer, ErrINVALIDPASSWORD
 	}
 
-	return cutomser, result.Find(&cutomser).Error
+	err = result.Update("loggedin", 1).Error
+	if err != nil {
+		return customer, err
+	}
+
+	return customer, result.Find(&customer).Error
 }
 
 // SignOutUserByID SinOut!

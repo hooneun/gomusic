@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -74,7 +75,12 @@ func (h *Handler) SiginIn(c *gin.Context) {
 	}
 	customer, err = h.db.SignInUser(customer.Email, customer.Password)
 	if err != nil {
+		if err == dblayer.ErrINVALIDPASSWORD {
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 	c.JSON(http.StatusOK, customer)
 }
@@ -141,5 +147,22 @@ func (h *Handler) GetOrders(c *gin.Context) {
 func (h *Handler) Charge(c *gin.Context) {
 	if h.db == nil {
 		return
+	}
+}
+
+// func customMiddleware() gin.HandlerFunc {
+// 	return func(c *gin.Context) {
+// 		c.Set("v", "123")
+// 		c.Next()
+// 		status := c.Writer.Status()
+// 	}
+// }
+
+// MyCustomLogger !
+func MyCustomLogger() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		fmt.Println("********************")
+		c.Next()
+		fmt.Println("********************")
 	}
 }
