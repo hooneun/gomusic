@@ -528,3 +528,75 @@ func (mock *MockDBLayer) AddUser(customer models.Customer) (models.Customer, err
 	mock.customers = append(mock.customers, customer)
 	return customer, nil
 }
+
+// SignInUser !
+func (mock *MockDBLayer) SignInUser(email, password string) (models.Customer, error) {
+	if mock.err != nil {
+		return models.Customer{}, mock.err
+	}
+	for _, customer := range mock.customers {
+		if strings.EqualFold(email, customer.Email) && customer.Password == password {
+			customer.LoggedIn = true
+			return customer, nil
+		}
+	}
+
+	return models.Customer{}, fmt.Errorf("Could not sign in user %s", email)
+}
+
+// SignOutUserByID !
+func (mock *MockDBLayer) SignOutUserByID(id int) error {
+	if mock.err != nil {
+		return mock.err
+	}
+	for _, customer := range mock.customers {
+		if customer.ID == uint(id) {
+			customer.LoggedIn = false
+			return nil
+		}
+	}
+	return fmt.Errorf("Cluld not sign out user %d", id)
+}
+
+// GetCustomerOrdersByID !
+func (mock *MockDBLayer) GetCustomerOrdersByID(id int) ([]models.Order, error) {
+	if mock.err != nil {
+		return nil, mock.err
+	}
+	for _, customer := range mock.customers {
+		if customer.ID == uint(id) {
+			return customer.Orders, nil
+		}
+	}
+	return nil, fmt.Errorf("Cluld not find customer id %d", id)
+}
+
+// AddOrder !
+func (mock *MockDBLayer) AddOrder(order models.Order) error {
+	if mock.err != nil {
+		return mock.err
+	}
+	for _, customer := range mock.customers {
+		if customer.ID == uint(order.CustomerID) {
+			customer.Orders = append(customer.Orders, order)
+			return nil
+		}
+	}
+	return fmt.Errorf("Could not find customer id %d for order", order.CustomerID)
+}
+
+// GetCreditCardID !
+func (mock *MockDBLayer) GetCreditCardID(id int) (string, error) {
+	if mock.err != nil {
+		return "", mock.err
+	}
+	return "", nil
+}
+
+// SaveCreditCardForCustomer !
+func (mock *MockDBLayer) SaveCreditCardForCustomer(int, string) error {
+	if mock.err != nil {
+		return mock.err
+	}
+	return nil
+}
